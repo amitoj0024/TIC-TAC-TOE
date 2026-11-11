@@ -6,6 +6,8 @@ let winnerMsg = document.querySelector("#winner-msg");
 
 let turnO = true;
 let count = 0;
+let isGameOver = false;
+let autoResetTimer = null;
 
 let player1Score = 0;
 let player2Score = 0;
@@ -41,6 +43,11 @@ const enableBoxes = () => {
 
 // Reset game
 const resetGame = () => {
+    if (autoResetTimer) {
+        clearTimeout(autoResetTimer);
+        autoResetTimer = null;
+    }
+    isGameOver = false;
     turnO = true;
     count = 0;
     winnerMsg.innerText = "";
@@ -57,6 +64,8 @@ const checkWinner = () => {
         let pos3 = boxes[pattern[2]].innerText;
 
         if (pos1 !== "" && pos1 === pos2 && pos2 === pos3) {
+            isGameOver = true;
+
             // Add winner effect
             boxes[pattern[0]].classList.add("winner");
             boxes[pattern[1]].classList.add("winner");
@@ -73,6 +82,12 @@ const checkWinner = () => {
             }
 
             disableBoxes();
+
+            // Automatically reset the board after a 2-second delay for the next round
+            autoResetTimer = setTimeout(() => {
+                resetGame();
+            }, 2000);
+
             return true;
         }
     }
@@ -81,13 +96,23 @@ const checkWinner = () => {
 
 // Draw game
 const gameDraw = () => {
+    isGameOver = true;
     winnerMsg.innerText = "🤝 Game was a Draw!";
     disableBoxes();
+
+    // Automatically reset the board after a 2-second delay for the next round
+    autoResetTimer = setTimeout(() => {
+        resetGame();
+    }, 2000);
 };
 
 // Box click events
 boxes.forEach((box) => {
     box.addEventListener("click", () => {
+        if (isGameOver || box.disabled || box.innerText !== "") {
+            return;
+        }
+
         if (turnO) {
             box.innerText = "O";
             turnO = false;

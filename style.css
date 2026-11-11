@@ -62,6 +62,7 @@ body{
 
 .box:disabled{
     cursor: not-allowed;
+    pointer-events: none;
 }
 
 #RESET-BUTTON{
